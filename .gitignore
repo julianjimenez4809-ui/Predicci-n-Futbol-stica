@@ -1,0 +1,22 @@
+# Entorno virtual
+.venv/
+venv/
+env/
+__pycache__/
+
+# Datos (Archivos pesados)
+data/*.csv
+data/*.xlsx
+data/*.parquet
+
+# Notebooks y checkpoints
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# IDEs
+.vscode/
+.idea/
+
+# SO
+.DS_Store
+Thmubs.db
