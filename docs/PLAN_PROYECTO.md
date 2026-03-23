@@ -54,3 +54,19 @@ Este documento detalla la hoja de ruta para el desarrollo del proyecto de Machin
 *   **Riesgo:** Inestabilidad de la API -> **Mitigación:** Ya descargamos los CSVs en local para trabajar offline.
 *   **Riesgo:** Sesgo hacia "No Gol" en xG -> **Mitigación:** Usar métricas como F1-Score y AUC, no solo Accuracy.
 *   **Riesgo:** Data Leakage en Match Predictor -> **Mitigación:** Asegurar que las features del partido se calculen con datos previos al encuentro.
+
+---
+
+## 🌳 Estrategia de Ramas (Git Flow Simplificado)
+
+Para mantener el código organizado y evitar conflictos, utilizaremos las siguientes ramas:
+
+*   **`main`**: Rama de producción. Solo contiene código estable y funcional. Los cambios solo llegan aquí mediante merge desde `develop`.
+*   **`develop`**: Rama principal de integración. Combina los avances de cada integrante antes de pasar a `main`.
+*   **`feature/xg-model`**: Rama de trabajo para el **Integrante 1**. Desarrollo del modelo de goles esperados y procesamiento de `events.csv`.
+*   **`feature/match-predictor-dashboard`**: Rama de trabajo para el **Integrante 2**. Desarrollo del predictor de partidos, manejo de `matches.csv` y creación del Dashboard.
+
+### **Cómo proceder:**
+1.  Cada integrante trabaja en su rama de **feature**.
+2.  Al completar una tarea, se hace un **Merge Request (PR)** hacia `develop`.
+3.  Una vez verificado que todo funciona en `develop`, se hace el merge final a `main`.
