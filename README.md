@@ -8,8 +8,8 @@ Este proyecto busca construir un pipeline completo de Machine Learning para pred
 ---
 
 ## 👥 Integrantes
-*   **Integrante 1:** [Nombre Completo / Código]
-*   **Integrante 2:** [Nombre Completo / Código]
+*   **Integrante 1:** Julian Camilo Jimenez Rodriguez
+*   **Integrante 2:** Julian Steven Duarte Gomez
 
 ---
 
