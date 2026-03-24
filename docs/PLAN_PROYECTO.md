@@ -50,6 +50,17 @@ Este documento detalla la hoja de ruta para el desarrollo del proyecto de Machin
 
 ---
 
+## ⚙️ Pipeline de Procesamiento Coherente
+Para que ambos integrantes trabajen con los mismos datos transformados, seguiremos estas reglas en el notebook de EDA:
+
+1.  **Parsing de Qualifiers:** Se usará una función estandarizada para convertir el string JSON de `qualifiers` en columnas booleanas (`is_big_chance`, `is_header`, etc.).
+2.  **Cálculo de xG Features:**
+    *   **Distancia:** Calculada desde el punto `(x, y)` al centro de la portería `(100, 50)`.
+    *   **Ángulo:** Ángulo de visión hacia la portería basado en las coordenadas Opta.
+3.  **Agregación para Match Predictor:** Los datos de eventos deben agruparse por `match_id` y `team_name` antes de unirse con `matches.csv` para evitar duplicidad de filas.
+
+---
+
 ## 🔥 Riesgos & Mitigación
 *   **Riesgo:** Inestabilidad de la API -> **Mitigación:** Ya descargamos los CSVs en local para trabajar offline.
 *   **Riesgo:** Sesgo hacia "No Gol" en xG -> **Mitigación:** Usar métricas como F1-Score y AUC, no solo Accuracy.

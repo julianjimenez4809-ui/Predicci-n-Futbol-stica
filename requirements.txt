@@ -1,0 +1,11 @@
+pandas
+numpy
+scikit-learn
+matplotlib
+seaborn
+mplsoccer
+plotly
+requests
+nbformat
+ipykernel
+unidecode
