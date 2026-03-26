@@ -8,4 +8,4 @@ plotly
 requests
 nbformat
 ipykernel
-unidecode
+xgboost
