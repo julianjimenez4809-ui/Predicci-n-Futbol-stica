@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pronostico Futbolístico — Premier League 2025-26</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & BASE ─────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:      #070914;
+  --surface: #0D1025;
+  --raised:  #111428;
+  --border:  #1E2340;
+  --gold:    #F5A623;
+  --green:   #00FF94;
+  --cyan:    #00E5FF;
+  --purple:  #BF5FFF;
+  --red:     #FF3D5A;
+  --orange:  #FF7A1A;
+  --fg-pri:  #F0F2FF;
+  --fg-sec:  #8892B8;
+  --fg-mut:  #4A5280;
+
+  --glow-gold:   rgba(245,166,35,0.5);
+  --glow-green:  rgba(0,255,148,0.5);
+  --glow-cyan:   rgba(0,229,255,0.5);
+  --glow-purple: rgba(191,95,255,0.5);
+  --glow-red:    rgba(255,61,90,0.5);
+  --glow-orange: rgba(255,122,26,0.5);
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg-pri);
+  font-family: 'DM Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 2px; }
+select option { background: #0F1330; color: var(--fg-pri); }
+
+/* ── VIDEO BG ── */
+#bg-video {
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; z-index: 0;
+  opacity: 0.5; filter: saturate(0.5) brightness(0.45) hue-rotate(200deg);
+  pointer-events: none;
+}
+#bg-overlay {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(7,9,20,0.25) 0%, rgba(7,9,20,0.7) 100%),
+              linear-gradient(180deg, rgba(7,9,20,0.45) 0%, rgba(7,9,20,0.05) 40%, rgba(7,9,20,0.45) 100%);
+}
+#bg-dots {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+#bg-scan {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.025) 2px, rgba(0,0,0,0.025) 4px);
+  animation: scanFlicker 8s ease-in-out infinite;
+}
+#root { position: relative; z-index: 1; }
+
+/* ── ANIMATIONS ── */
+@keyframes scanFlicker {
+  0%,100%{opacity:1} 48%{opacity:1} 50%{opacity:.6} 52%{opacity:1} 72%{opacity:1} 73%{opacity:.7} 74%{opacity:1}
+}
+@keyframes fadeUp {
+  from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)}
+}
+@keyframes neonPulse {
+  0%,100%{opacity:1} 50%{opacity:.65}
+}
+@keyframes tickerScroll {
+  from{transform:translateX(0)} to{transform:translateX(-50%)}
+}
+@keyframes countUp {
+  from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)}
+}
+@keyframes glitchMain {
+  0%,94%,100%{transform:translate(0)}
+  95%{transform:translate(-2px,1px) skewX(-1deg)}
+  96%{transform:translate(3px,-1px) skewX(1deg)}
+  97%{transform:translate(-1px,2px)}
+  98%{transform:translate(2px,0) skewX(-.5deg)}
+  99%{transform:translate(0)}
+}
+@keyframes glitch1 {
+  0%{clip-path:inset(0 0 95% 0);transform:translate(-3px,0)}
+  20%{clip-path:inset(30% 0 50% 0);transform:translate(3px,0)}
+  40%{clip-path:inset(70% 0 10% 0);transform:translate(-2px,0)}
+  60%{clip-path:inset(10% 0 80% 0);transform:translate(4px,0)}
+  80%{clip-path:inset(50% 0 30% 0);transform:translate(-3px,0)}
+  100%{clip-path:inset(95% 0 0 0);transform:translate(0)}
+}
+@keyframes glitch2 {
+  0%{clip-path:inset(80% 0 0 0);transform:translate(3px,0);color:#00E5FF}
+  25%{clip-path:inset(10% 0 70% 0);transform:translate(-4px,0);color:#FF3D5A}
+  50%{clip-path:inset(40% 0 40% 0);transform:translate(2px,0);color:#BF5FFF}
+  75%{clip-path:inset(60% 0 20% 0);transform:translate(-3px,0);color:#00E5FF}
+  100%{clip-path:inset(0 0 90% 0);transform:translate(0);color:#FF3D5A}
+}
+@keyframes barGrow { from{width:0} }
+@keyframes spin { to{transform:rotate(360deg)} }
+
+/* ── GLITCH ── */
+.glitch { position:relative; animation:glitchMain 6s ease-in-out infinite; }
+.glitch::before,.glitch::after { content:attr(data-text); position:absolute; inset:0; font-family:inherit; font-size:inherit; font-weight:inherit; letter-spacing:inherit; line-height:inherit; pointer-events:none; }
+.glitch::before { color:#00E5FF; animation:glitch1 6s ease-in-out infinite .05s; opacity:.7; }
+.glitch::after  { color:#FF3D5A; animation:glitch2 6s ease-in-out infinite .1s;  opacity:.6; }
+
+/* ── FADE-UP STAGGER ── */
+.fade-up { animation:fadeUp .6s cubic-bezier(.25,1,.5,1) both; }
+.fu1{animation-delay:.06s} .fu2{animation-delay:.12s} .fu3{animation-delay:.18s}
+.fu4{animation-delay:.24s} .fu5{animation-delay:.30s} .fu6{animation-delay:.36s}
+
+/* ── NEON TEXT ── */
+.neon-gold   { color:var(--gold);   text-shadow:0 0 20px rgba(245,166,35,.8),0 0 60px rgba(245,166,35,.3); }
+.neon-green  { color:var(--green);  text-shadow:0 0 20px rgba(0,255,148,.8),0 0 60px rgba(0,255,148,.3); }
+.neon-cyan   { color:var(--cyan);   text-shadow:0 0 20px rgba(0,229,255,.8),0 0 60px rgba(0,229,255,.3); }
+.neon-purple { color:var(--purple); text-shadow:0 0 20px rgba(191,95,255,.8),0 0 60px rgba(191,95,255,.3); }
+.neon-red    { color:var(--red);    text-shadow:0 0 20px rgba(255,61,90,.8), 0 0 60px rgba(255,61,90,.3); }
+
+/* ── TICKER ── */
+.ticker-wrap { overflow:hidden; background:rgba(245,166,35,.05); border-top:1px solid rgba(245,166,35,.18); border-bottom:1px solid rgba(245,166,35,.18); padding:6px 0; }
+.ticker { display:flex; white-space:nowrap; animation:tickerScroll 32s linear infinite; width:max-content; }
+.ticker-item { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--gold); letter-spacing:.1em; padding:0 24px; opacity:.8; }
+.ticker-sep  { color:rgba(245,166,35,.3); }
+
+/* ── HUD CARD ── */
+.hud-card {
+  background: var(--surface);
+  border-radius: 4px;
+  transition: transform .25s cubic-bezier(.25,1,.5,1), box-shadow .25s;
+}
+.hud-card:hover { transform:translateY(-2px); }
+
+/* ── HUD CORNER BRACKETS ── */
+.hud-card { position:relative; }
+.hud-card::before,.hud-card::after,.hud-br::before,.hud-br::after {
+  content:''; position:absolute; width:12px; height:12px;
+  border-color:inherit; border-style:solid; border-width:0; opacity:.55;
+}
+.hud-card::before { top:-1px;left:-1px;   border-top-width:2px;border-left-width:2px; }
+.hud-card::after  { top:-1px;right:-1px;  border-top-width:2px;border-right-width:2px; }
+.hud-br::before   { bottom:-1px;left:-1px;  border-bottom-width:2px;border-left-width:2px; }
+.hud-br::after    { bottom:-1px;right:-1px; border-bottom-width:2px;border-right-width:2px; }
+
+/* ── PULSE DOT ── */
+.pulse-dot { width:6px;height:6px;border-radius:50%;animation:neonPulse 2s ease-in-out infinite; }
+
+/* ── NAV ── */
+#nav {
+  background:rgba(7,9,20,.95); border-bottom:1px solid rgba(245,166,35,.18);
+  padding:0 32px; display:flex; align-items:center; gap:28px;
+  height:56px; position:sticky; top:0; z-index:100; backdrop-filter:blur(14px);
+}
+.nav-logo { display:flex; align-items:center; gap:10px; flex-shrink:0; text-decoration:none; }
+.nav-logo-ball { font-size:22px; }
+.nav-logo-main { font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:.12em; color:var(--gold); text-shadow:0 0 18px var(--glow-gold); }
+.nav-logo-sub  { font-family:'Barlow Condensed',sans-serif; font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:var(--fg-mut); align-self:flex-end; padding-bottom:4px; }
+nav { display:flex; gap:2px; flex:1; }
+nav button {
+  font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--fg-mut);
+  background:transparent; border:none; padding:18px 16px; cursor:pointer;
+  transition:color .15s; border-bottom:2px solid transparent;
+}
+nav button.active { color:var(--fg-pri); border-bottom-color:var(--gold); text-shadow:0 0 16px var(--glow-gold); }
+nav button:hover:not(.active) { color:var(--fg-sec); }
+.nav-live { display:flex; gap:6px; align-items:center; }
+.nav-live span { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--green); letter-spacing:.1em; }
+
+/* ── SECTION HEAD ── */
+.section-head { display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+.section-head-bar { width:3px; height:20px; border-radius:2px; flex-shrink:0; }
+.section-head h2 { font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--fg-pri); }
+.section-head .sub { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--fg-mut); }
+
+/* ── METRIC CARD ── */
+.metric-val { font-family:'Bebas Neue',sans-serif; font-size:50px; line-height:1; letter-spacing:.04em; margin-bottom:8px; animation:countUp .4s ease both; }
+.metric-label { display:flex; align-items:center; gap:6px; }
+.metric-label span { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--fg-mut); text-transform:uppercase; letter-spacing:.12em; }
+
+/* ── BAR CHART ROWS ── */
+.bar-row { display:flex; align-items:center; gap:12px; }
+.bar-name { font-family:'DM Sans',sans-serif; font-size:12px; color:var(--fg-sec); width:130px; flex-shrink:0; }
+.bar-track { flex:1; background:rgba(255,255,255,.03); border-radius:2px; height:24px; overflow:hidden; position:relative; border:1px solid rgba(255,255,255,.05); }
+.bar-fill { height:100%; border-radius:2px; display:flex; align-items:center; justify-content:flex-end; padding-right:8px; transition:width 1.2s cubic-bezier(.25,1,.5,1); }
+.bar-fill span { font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; }
+
+/* ── CLUSTER BADGES ── */
+.cluster-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.cluster-item { border-radius:4px; padding:12px 14px; cursor:pointer; transition:all .25s; }
+.cluster-name { font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:6px; }
+.cluster-teams { display:flex; gap:4px; flex-wrap:wrap; }
+.cluster-badge { font-family:'JetBrains Mono',monospace; font-size:9px; border-radius:2px; padding:2px 5px; letter-spacing:.06em; border:1px solid; }
+.cluster-desc { margin-top:8px; font-family:'DM Sans',sans-serif; font-size:11px; line-height:1.4; }
+
+/* ── PREDICTOR ── */
+.pred-slot-label { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--fg-mut); letter-spacing:.14em; text-transform:uppercase; margin-bottom:6px; }
+.pred-abbr { font-family:'Bebas Neue',sans-serif; font-size:44px; line-height:1; letter-spacing:.06em; }
+.pred-slot select { background:transparent; border:none; color:var(--fg-sec); font-family:'DM Sans',sans-serif; font-size:12px; cursor:pointer; outline:none; margin-top:4px; width:100%; }
+.pred-btn {
+  width:100%; font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:16px;
+  letter-spacing:.14em; text-transform:uppercase; border-radius:3px; padding:13px 0;
+  cursor:pointer; transition:all .2s; border:1px solid var(--gold);
+}
+.pred-btn:disabled { cursor:not-allowed; }
+
+/* ── PROB BARS ── */
+.prob-grid { display:flex; gap:6px; margin-top:16px; animation:fadeUp .4s ease both; }
+.prob-cell { flex:1; border-radius:4px; padding:10px 6px; text-align:center; transition:flex .6s cubic-bezier(.25,1,.5,1); }
+.prob-pct { font-family:'Bebas Neue',sans-serif; font-size:26px; }
+.prob-lbl { font-family:'JetBrains Mono',monospace; font-size:8px; opacity:.7; letter-spacing:.1em; }
+
+/* ── FEATURE TAGS ── */
+.feat-tag { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--cyan); border:1px solid rgba(0,229,255,.27); border-radius:2px; padding:3px 8px; letter-spacing:.04em; }
+
+/* ── TABS ── */
+.tab-row { display:flex; gap:0; border-bottom:1px solid var(--border); margin-bottom:20px; }
+.tab-btn { font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; background:transparent; border:none; border-bottom:2px solid transparent; padding:10px 20px; cursor:pointer; color:var(--fg-mut); transition:all .15s; }
+.tab-btn.active { color:var(--fg-pri); border-bottom-color:var(--cyan); }
+
+/* ── VIEWS ── */
+.view { display:none; }
+.view.active { display:block; }
+
+/* ── SPINNER ── */
+.spinner { width:16px; height:16px; border:2px solid transparent; border-top-color:var(--gold); border-radius:50%; animation:spin .7s linear infinite; display:inline-block; }
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .kpi-grid { grid-template-columns:repeat(3,1fr) !important; }
+  .two-col  { grid-template-columns:1fr !important; }
+  .three-two{ grid-template-columns:1fr !important; }
+}
+@media(max-width:600px){
+  #nav { padding:0 16px; gap:12px; }
+  nav button { padding:18px 10px; font-size:11px; }
+  .hero-title { font-size:42px !important; }
+  .kpi-grid { grid-template-columns:repeat(2,1fr) !important; }
+}
+
+/* ── SHOT MAP IMG ── */
+.shot-header { padding:14px 20px; display:flex; align-items:center; gap:16px; }
+.shot-img { width:100%; display:block; }
+
+/* ── STAT MINI ── */
+.stat-mini { text-align:center; }
+.stat-mini-val { font-family:'Bebas Neue',sans-serif; font-size:22px; }
+.stat-mini-lbl { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--fg-mut); letter-spacing:.1em; text-transform:uppercase; margin-top:2px; }
+
+/* ── RESULT SUMMARY BOX ── */
+.result-box { margin-top:10px; background:var(--raised); border:1px solid var(--border); border-radius:3px; padding:8px 14px; font-family:'DM Sans',sans-serif; font-size:13px; }
+
+/* ── TEAM STATS ROW ── */
+.team-stats-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; }
+.team-stat-card { background:var(--raised); border:1px solid var(--border); border-radius:3px; padding:10px 14px; }
+.team-stat-name { font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px; }
+.team-stat-row  { display:flex; justify-content:space-between; align-items:center; padding:3px 0; border-bottom:1px solid rgba(255,255,255,.04); }
+.team-stat-row:last-child { border:none; }
+.team-stat-k { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--fg-mut); letter-spacing:.06em; }
+.team-stat-v { font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; }
+</style>
+</head>
+<body>
+
+<!-- VIDEO BACKGROUND -->
+<video id="bg-video" src="Video_Realista_De_Jugador_Pateando.mp4" muted playsinline preload="auto"></video>
+<div id="bg-overlay"></div>
+<div id="bg-dots"></div>
+<div id="bg-scan"></div>
+
+<div id="root">
+  <!-- NAV -->
+  <header id="nav">
+    <a class="nav-logo" href="#" onclick="showView('dashboard');return false;">
+      <span class="nav-logo-ball">⚽</span>
+      <span class="nav-logo-main">PRONOSTICO</span>
+      <span class="nav-logo-sub">Futbolístico</span>
+    </a>
+    <nav id="main-nav">
+      <button class="active" onclick="showView('dashboard')">Dashboard</button>
+      <button onclick="showView('shotmap')">Shot Map</button>
+      <button onclick="showView('predictor')">Predictor</button>
+      <button onclick="showView('clustering')">Clustering</button>
+      <button onclick="showView('modelos')">Modelos</button>
+    </nav>
+    <div class="nav-live">
+      <div class="pulse-dot" style="background:var(--green);box-shadow:0 0 10px var(--glow-green);"></div>
+      <span>PL 2025–26</span>
+    </div>
+  </header>
+
+  <!-- TICKER -->
+  <div class="ticker-wrap">
+    <div class="ticker" id="ticker"></div>
+  </div>
+
+  <main style="max-width:1300px;margin:0 auto;width:100%;padding:0 32px 80px;">
+
+    <!-- ══════════════ DASHBOARD VIEW ══════════════ -->
+    <div id="view-dashboard" class="view active">
+      <!-- Hero -->
+      <div class="fade-up" style="padding:36px 0 4px;">
+        <div class="hero-title" style="font-family:'Bebas Neue',sans-serif;font-size:72px;letter-spacing:.06em;line-height:.9;color:var(--fg-pri);margin-bottom:6px;">
+          ¿PUEDES PREDECIR EL FÚTBOL
+        </div>
+        <div class="glitch hero-title neon-gold" data-text="MEJOR QUE BET365?" style="font-family:'Bebas Neue',sans-serif;font-size:72px;letter-spacing:.06em;line-height:.9;margin-bottom:18px;">
+          MEJOR QUE BET365?
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--fg-mut);letter-spacing:.1em;">
+          MACHINE LEARNING I · UNIVERSIDAD EXTERNADO DE COLOMBIA · PL 2025–26
+        </div>
+      </div>
+
+      <!-- KPI Grid -->
+      <div class="kpi-grid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:24px;" id="kpi-grid"></div>
+
+      <!-- Row: Model Chart + Clusters -->
+      <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
+        <div class="fade-up fu2" id="model-chart-home"></div>
+        <div class="fade-up fu3" id="cluster-panel-home"></div>
+      </div>
+
+      <!-- Shot Map -->
+      <div class="fade-up fu4" style="margin-top:16px;" id="shot-panel-home"></div>
+    </div>
+
+    <!-- ══════════════ SHOT MAP VIEW ══════════════ -->
+    <div id="view-shotmap" class="view">
+      <div class="fade-up" style="padding-top:32px;margin-bottom:20px;">
+        <div class="glitch neon-purple" data-text="SHOT MAP & xG" style="font-family:'Bebas Neue',sans-serif;font-size:56px;letter-spacing:.06em;">SHOT MAP & xG</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--fg-sec);margin-top:4px;">7,198 tiros · 807 goles · GW1–GW30 · Premier League 2025–26</div>
+      </div>
+      <!-- Stats row -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;">
+        <div id="sm-stat-1"></div><div id="sm-stat-2"></div><div id="sm-stat-3"></div><div id="sm-stat-4"></div>
+      </div>
+      <!-- Shot map image -->
+      <div id="shotmap-card"></div>
+      <!-- ROC below -->
+      <div style="margin-top:16px;" id="roc-card"></div>
+    </div>
+
+    <!-- ══════════════ PREDICTOR VIEW ══════════════ -->
+    <div id="view-predictor" class="view">
+      <div style="max-width:720px;margin:40px auto;">
+        <div class="fade-up" style="margin-bottom:20px;">
+          <div class="glitch neon-gold" data-text="PREDICTOR DE PARTIDOS" style="font-family:'Bebas Neue',sans-serif;font-size:56px;letter-spacing:.06em;">PREDICTOR DE PARTIDOS</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--fg-sec);margin-top:4px;">Selecciona dos equipos y obtén probabilidades H/D/A basadas en nuestro modelo de ML.</div>
+        </div>
+        <div class="fade-up fu1" id="predictor-card"></div>
+        <!-- Features -->
+        <div class="fade-up fu2" style="margin-top:12px;">
+          <div id="features-card"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ CLUSTERING VIEW ══════════════ -->
+    <div id="view-clustering" class="view">
+      <div class="fade-up" style="padding-top:32px;margin-bottom:20px;">
+        <div class="glitch neon-purple" data-text="ESTILOS DE JUEGO" style="font-family:'Bebas Neue',sans-serif;font-size:56px;letter-spacing:.06em;">ESTILOS DE JUEGO</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--fg-sec);margin-top:4px;">K-Means · 20 equipos · 4 perfiles tácticos identificados</div>
+      </div>
+      <div class="three-two" style="display:grid;grid-template-columns:3fr 2fr;gap:16px;">
+        <div id="cluster-img-card"></div>
+        <div id="cluster-panel-full"></div>
+      </div>
+      <!-- Infographic below -->
+      <div style="margin-top:16px;" id="infographic-card"></div>
+    </div>
+
+    <!-- ══════════════ MODELOS VIEW ══════════════ -->
+    <div id="view-modelos" class="view">
+      <div class="fade-up" style="padding-top:32px;margin-bottom:20px;">
+        <div class="glitch neon-cyan" data-text="RESULTADOS DE MODELOS" style="font-family:'Bebas Neue',sans-serif;font-size:56px;letter-spacing:.06em;">RESULTADOS DE MODELOS</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--fg-sec);margin-top:4px;">Evaluación comparativa · Accuracy, AUC-ROC, Precisión, Recall · 5-Fold CV Estratificado</div>
+      </div>
+      <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div id="model-chart-full"></div>
+        <div id="roc-card-models"></div>
+        <div id="benchmark-card"></div>
+        <div id="all-models-card"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   CONSTANTS
+══════════════════════════════════════════════════════ */
+const C = {
+  bg:'#070914', surface:'#0D1025', raised:'#111428', border:'#1E2340',
+  gold:'#F5A623', green:'#00FF94', cyan:'#00E5FF', purple:'#BF5FFF',
+  red:'#FF3D5A', orange:'#FF7A1A', fgPri:'#F0F2FF', fgSec:'#8892B8', fgMut:'#4A5280',
+};
+const GLOW = {
+  gold:'rgba(245,166,35,0.5)', green:'rgba(0,255,148,0.5)', cyan:'rgba(0,229,255,0.5)',
+  purple:'rgba(191,95,255,0.5)', red:'rgba(255,61,90,0.5)', orange:'rgba(255,122,26,0.5)',
+};
+function glowOf(c){return Object.values(GLOW).find((_,i)=>Object.values(C)[i+4]===c)||'rgba(245,166,35,0.4)';}
+
+const ABBRS = {
+  'Arsenal':'ARS','Aston Villa':'AVL','Bournemouth':'BOU','Brentford':'BRE',
+  'Brighton':'BHA','Burnley':'BUR','Chelsea':'CHE','Crystal Palace':'CRY',
+  'Everton':'EVE','Fulham':'FUL','Leeds':'LEE','Liverpool':'LIV',
+  'Man City':'MCI','Man United':'MUN','Newcastle':'NEW',"Nott'm Forest":'NFO',
+  'Southampton':'SOU','Sunderland':'SUN','Tottenham':'TOT','West Ham':'WHU','Wolves':'WOL',
+};
+function abbr(t){return ABBRS[t]||t.substring(0,3).toUpperCase();}
+
+const TICKER_ITEMS = [
+  'xG TOTAL: 2803','GOLES REALES: 807','CONVERSIÓN: 10.8%',
+  'ACCURACY LOGÍSTICA: 49.4%','BENCHMARK BET365: 50.2%','AUC-ROC xG: 0.774',
+  'K-FOLD CV: 5 PLIEGUES','PARTIDOS ANALIZADOS: 241','TIROS: 7,198',
+  'EQUIPOS: 20','TEMPORADA: PL 2025-26','FEATURES: 11',
+];
+
+const MODELS_DATA = [
+  { name:'Logística OvR (C=0.1)',  acc:49.4, color:C.green, isTop:true },
+  { name:'Logística OvR (C=10)',   acc:47.8, color:C.green  },
+  { name:'Logística OvR (C=1)',    acc:47.3, color:C.cyan   },
+  { name:'Random Forest depth=3',  acc:45.7, color:C.gold   },
+  { name:'Logística solo rolling', acc:44.4, color:C.gold   },
+  { name:'Random Forest depth=5',  acc:43.2, color:C.orange },
+  { name:'Gradient Boosting',      acc:43.2, color:C.orange },
+  { name:'Logística + rolling',    acc:41.5, color:C.red    },
+  { name:'Baseline (siempre H)',   acc:41.5, color:C.fgMut, isRef:true },
+  { name:'XGBoost',                acc:40.2, color:C.red    },
+];
+
+const CLUSTERS = [
+  { icon:'⬡', name:'Top-Tier Dominantes',  color:C.gold,   teams:['Arsenal','Chelsea','Man City'],       desc:'Alta posesión, alto pressing, dominan territorialmente.' },
+  { icon:'⬡', name:'Muros Defensivos',     color:C.cyan,   teams:['Liverpool','Newcastle','Tottenham'],  desc:'Compactos, bajo xG concedido, sólidos en defensa.' },
+  { icon:'⬡', name:'Contragolpeadores',    color:C.orange, teams:['Brentford','Burnley','Fulham'],       desc:'Transición rápida, eficientes en ataque directo.' },
+  { icon:'⬡', name:'Equipos en Riesgo',    color:C.red,    teams:['Bournemouth','Brighton','Wolves'],    desc:'Baja eficiencia ofensiva, defensas expuestas.' },
+];
+
+/* ══════════════════════════════════════════════════════
+   VIDEO SCROLL DRIVER
+══════════════════════════════════════════════════════ */
+(function(){
+  const video = document.getElementById('bg-video');
+  let duration=0, idleRaf=null, idleDir=1, idlePos=0, idleTimeout=null;
+  video.addEventListener('loadedmetadata',()=>{ duration=video.duration; video.pause(); updateVideo(); });
+  function updateVideo(){
+    if(!duration)return;
+    const progress=Math.min(window.scrollY/(Math.max(1,document.documentElement.scrollHeight-window.innerHeight)),1);
+    video.currentTime=progress*duration;
+  }
+  window.addEventListener('scroll',()=>{ stopIdle(); updateVideo(); clearTimeout(idleTimeout); idleTimeout=setTimeout(startIdle,2000); },{passive:true});
+  function startIdle(){
+    if(idleRaf)return;
+    function tick(){
+      if(!duration){idleRaf=requestAnimationFrame(tick);return;}
+      idlePos+=idleDir*0.0003; if(idlePos>0.04||idlePos<0)idleDir*=-1;
+      const sp=window.scrollY/Math.max(1,document.documentElement.scrollHeight-window.innerHeight);
+      video.currentTime=Math.min((sp+idlePos)*duration,duration);
+      idleRaf=requestAnimationFrame(tick);
+    }
+    idleRaf=requestAnimationFrame(tick);
+  }
+  function stopIdle(){ if(idleRaf){cancelAnimationFrame(idleRaf);idleRaf=null;} }
+  setTimeout(startIdle,2000);
+})();
+
+/* ══════════════════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════════════════ */
+function hudCard(color, content, style='', glow=true){
+  const g=glowOf(color);
+  const shadow=glow
+    ?`0 0 12px ${g.replace('0.5','0.28')},0 0 40px ${g.replace('0.5','0.07')},inset 0 0 16px rgba(0,0,0,0.5)`
+    :`inset 0 0 16px rgba(0,0,0,0.5)`;
+  return `<div class="hud-card" style="background:${C.surface};border:1px solid ${color};border-color:${color};box-shadow:${shadow};${style}">
+    ${content}<div class="hud-br" style="border-color:${color};"></div>
+  </div>`;
+}
+
+function sectionHead(title, sub, color){
+  const g=glowOf(color);
+  return `<div class="section-head">
+    <div class="section-head-bar" style="background:${color};box-shadow:0 0 12px ${color};"></div>
+    <h2>${title}</h2>
+    ${sub?`<span class="sub">${sub}</span>`:''}
+  </div>`;
+}
+
+function pulseDot(color){
+  const g=glowOf(color);
+  return `<div class="pulse-dot" style="background:${color};box-shadow:0 0 8px ${g};"></div>`;
+}
+
+function countUp(el, target, decimals=0, suffix='', duration=1400){
+  const isComma=String(target).includes(',');
+  const num=parseFloat(String(target).replace(/[,%]/g,''));
+  let start=null;
+  function step(ts){
+    if(!start)start=ts;
+    const p=Math.min((ts-start)/duration,1);
+    const e=1-Math.pow(1-p,4);
+    const v=e*num;
+    let fmt;
+    if(isComma) fmt=Math.round(v).toLocaleString();
+    else if(decimals===3) fmt=v.toFixed(3);
+    else if(decimals===1) fmt=v.toFixed(1);
+    else fmt=Math.round(v);
+    el.textContent=fmt+suffix;
+    if(p<1)requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+/* ══════════════════════════════════════════════════════
+   TICKER
+══════════════════════════════════════════════════════ */
+function buildTicker(){
+  const items=[...TICKER_ITEMS,...TICKER_ITEMS];
+  document.getElementById('ticker').innerHTML=items.map(t=>
+    `<span class="ticker-item">${t} <span class="ticker-sep">◆</span></span>`
+  ).join('');
+}
+
+/* ══════════════════════════════════════════════════════
+   KPI CARDS
+══════════════════════════════════════════════════════ */
+const KPI_DEFS = [
+  { value:'7,198', label:'Tiros analizados',  color:C.gold,   dec:0, suf:'',   delay:0   },
+  { value:'807',   label:'Goles registrados', color:C.orange, dec:0, suf:'',   delay:80  },
+  { value:'0.774', label:'AUC Modelo xG',     color:C.purple, dec:3, suf:'',   delay:160 },
+  { value:'49.4',  label:'Mejor accuracy CV', color:C.green,  dec:1, suf:'%',  delay:240 },
+  { value:'241',   label:'Partidos modelo',   color:C.cyan,   dec:0, suf:'',   delay:320 },
+  { value:'50.2',  label:'Benchmark Bet365',  color:C.red,    dec:1, suf:'%',  delay:400 },
+];
+
+function buildKPI(containerId){
+  const grid=document.getElementById(containerId);
+  if(!grid)return;
+  grid.innerHTML=KPI_DEFS.map((k,i)=>{
+    const g=glowOf(k.color);
+    const shadow=`0 0 12px ${g.replace('0.5','0.28')},0 0 40px ${g.replace('0.5','0.07')},inset 0 0 16px rgba(0,0,0,0.5)`;
+    return `<div class="hud-card fade-up fu${i+1}" style="background:${C.surface};border:1px solid ${k.color};box-shadow:${shadow};padding:20px 20px 16px;">
+      <div class="metric-val" style="color:${k.color};text-shadow:0 0 24px ${g},0 0 60px ${g.replace('0.5','0.18')};animation-delay:${k.delay}ms" id="kpi-val-${i}">0${k.suf}</div>
+      <div class="metric-label">
+        ${pulseDot(k.color)}
+        <span>${k.label}</span>
+      </div>
+      <div class="hud-br" style="border-color:${k.color};"></div>
+    </div>`;
+  }).join('');
+  KPI_DEFS.forEach((k,i)=>{
+    setTimeout(()=>{
+      const el=document.getElementById(`kpi-val-${i}`);
+      if(el) countUp(el, k.value, k.dec, k.suf);
+    }, k.delay);
+  });
+}
+
+/* ══════════════════════════════════════════════════════
+   MODEL BAR CHART
+══════════════════════════════════════════════════════ */
+function buildModelChart(containerId, maxModels=4){
+  const el=document.getElementById(containerId);
+  if(!el)return;
+  const models=MODELS_DATA.slice(0,maxModels);
+  const bars=models.map(m=>{
+    const g=glowOf(m.color);
+    const isDim=m.isRef;
+    const bg=isDim
+      ?`repeating-linear-gradient(90deg,transparent,transparent 4px,${m.color}22 4px,${m.color}22 8px)`
+      :`linear-gradient(90deg,${m.color}22,${m.color}44)`;
+    return `<div class="bar-row" style="opacity:${isDim?.55:1}">
+      <div class="bar-name" style="color:${isDim?C.fgMut:C.fgSec}">${m.name}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${(m.acc/58)*100}%;background:${bg};border:1px solid ${m.color};box-shadow:${isDim?'none':`0 0 16px ${g}`};animation:barGrow 1.2s cubic-bezier(.25,1,.5,1) both;">
+          <span style="color:${m.color};text-shadow:0 0 10px ${g}">${m.acc}%</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  const delta=((MODELS_DATA[0].acc - 50.2)).toFixed(1);
+  const sign=delta>=0?'+':'';
+  el.innerHTML=hudCard(C.cyan,`
+    ${sectionHead('Comparación de Modelos','accuracy · 5-fold CV',C.cyan)}
+    <div style="display:flex;flex-direction:column;gap:12px">${bars}</div>
+    <div style="margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:10px;color:${C.fgMut};letter-spacing:.06em;">
+      BENCHMARK BET365 <span style="color:${C.red}">50.2%</span> &nbsp;·&nbsp;
+      Mejor modelo: <span style="color:${C.green}">${sign}${delta}pp</span> vs benchmark
+    </div>
+  `,'padding:20px;');
+}
+
+/* ══════════════════════════════════════════════════════
+   CLUSTER PANEL
+══════════════════════════════════════════════════════ */
+function buildClusterPanel(containerId){
+  const el=document.getElementById(containerId);
+  if(!el)return;
+  const items=CLUSTERS.map(cl=>{
+    const g=glowOf(cl.color);
+    const badges=cl.teams.map(t=>`<span class="cluster-badge" style="color:${cl.color};border-color:${cl.color}55">${abbr(t)}</span>`).join('');
+    return `<div class="cluster-item" style="background:rgba(255,255,255,.02);border:1px solid ${C.border};"
+      onmouseenter="this.style.background='${cl.color}14';this.style.borderColor='${cl.color}';this.style.boxShadow='0 0 20px ${g},inset 0 0 12px rgba(0,0,0,.5)';"
+      onmouseleave="this.style.background='rgba(255,255,255,.02)';this.style.borderColor='${C.border}';this.style.boxShadow='none';">
+      <div class="cluster-name" style="color:${cl.color}">${cl.icon} ${cl.name}</div>
+      <div class="cluster-teams">${badges}</div>
+      <div class="cluster-desc" style="color:${C.fgSec}">${cl.desc}</div>
+    </div>`;
+  }).join('');
+  el.innerHTML=hudCard(C.purple,`
+    ${sectionHead('Estilos de Juego','K-Means · 4 clusters',C.purple)}
+    <div class="cluster-grid">${items}</div>
+  `,'padding:20px;');
+}
+
+/* ══════════════════════════════════════════════════════
+   SHOT MAP PANEL
+══════════════════════════════════════════════════════ */
+function buildShotPanel(containerId){
+  const el=document.getElementById(containerId);
+  if(!el)return;
+  el.innerHTML=hudCard(C.purple,`
+    <div class="shot-header" style="border-bottom:1px solid rgba(191,95,255,.2);background:rgba(191,95,255,.05);">
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:${C.purple};text-shadow:0 0 20px ${GLOW.purple}">SHOT MAP & xG</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${C.fgMut}">7,198 tiros · 807 goles · GW1–GW30</span>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
+        ${pulseDot(C.green)}
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:${C.green};letter-spacing:.1em;">LIVE DATA</span>
+      </div>
+    </div>
+    <img src="../img/01_shot_map_premium.png" class="shot-img" alt="Shot Map & xG" loading="lazy" style="filter:brightness(1.08) saturate(1.1);">
+  `,'overflow:hidden;padding:0;');
+}
+
+/* ══════════════════════════════════════════════════════
+   IMAGE CARD HELPER
+══════════════════════════════════════════════════════ */
+function buildImgCard(containerId, color, title, sub, imgSrc){
+  const el=document.getElementById(containerId);
+  if(!el)return;
+  el.innerHTML=hudCard(color,`
+    <div style="padding:14px 20px;border-bottom:1px solid ${color}33;background:${color}08;">
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:${color}">${title}</span>
+      ${sub?`<span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${C.fgMut};margin-left:12px;">${sub}</span>`:''}
+    </div>
+    <img src="../img/${imgSrc}" style="width:100%;display:block;filter:brightness(1.1) saturate(1.15);" loading="lazy" alt="${title}">
+  `,'overflow:hidden;padding:0;');
+}
+
+/* ══════════════════════════════════════════════════════
+   SHOT MAP STATS
+══════════════════════════════════════════════════════ */
+function buildShotStats(){
+  const stats=[
+    {val:'7,198',lbl:'Tiros totales',   color:C.purple},
+    {val:'807',  lbl:'Goles marcados',  color:C.gold},
+    {val:'10.8%',lbl:'Conversión',      color:C.green},
+    {val:'0.774',lbl:'AUC-ROC xG',      color:C.cyan},
+  ];
+  stats.forEach((s,i)=>{
+    const el=document.getElementById(`sm-stat-${i+1}`);
+    if(!el)return;
+    const g=glowOf(s.color);
+    el.innerHTML=hudCard(s.color,`
+      <div style="text-align:center;padding:16px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:${s.color};text-shadow:0 0 20px ${g};line-height:1;">${s.val}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:${C.fgMut};text-transform:uppercase;letter-spacing:.1em;margin-top:4px;">${s.lbl}</div>
+      </div>
+    `,`padding:0;`);
+  });
+}
+
+/* ══════════════════════════════════════════════════════
+   PREDICTOR
+══════════════════════════════════════════════════════ */
+let predData=null;
+let predTeams=[];
+
+async function loadPredictions(){
+  try {
+    const r=await fetch('data/predictions.json');
+    predData=await r.json();
+    predTeams=predData.teams||[];
+    buildPredictor();
+    buildFeaturesCard();
+  } catch(e){ console.warn('No se pudo cargar predictions.json',e); }
+}
+
+function buildPredictor(){
+  const el=document.getElementById('predictor-card');
+  if(!el)return;
+  const opts=predTeams.map(t=>`<option value="${t}">${t}</option>`).join('');
+  el.innerHTML=hudCard(C.gold,`
+    ${sectionHead('Predictor 1 vs 1','Regresión Logística OvR · 49.4% accuracy CV',C.gold)}
+    <div style="display:flex;gap:16px;align-items:center;margin-bottom:20px;">
+      <!-- Local -->
+      <div style="flex:1;">
+        <div class="pred-slot-label">Local</div>
+        <div style="background:${C.raised};border:1px solid ${C.green};box-shadow:0 0 14px ${GLOW.green};border-radius:4px;padding:12px 16px;">
+          <div class="pred-abbr neon-green" id="pred-home-abbr">${abbr(predTeams[0]||'ARS')}</div>
+          <select id="pred-home" style="background:transparent;border:none;color:${C.fgSec};font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;outline:none;margin-top:4px;width:100%;" onchange="updateAbbr('home')">
+            ${opts}
+          </select>
+        </div>
+      </div>
+      <!-- VS -->
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:${C.fgMut};letter-spacing:.1em;flex-shrink:0;">VS</div>
+      <!-- Visitante -->
+      <div style="flex:1;">
+        <div class="pred-slot-label">Visitante</div>
+        <div style="background:${C.raised};border:1px solid ${C.red};box-shadow:0 0 14px ${GLOW.red};border-radius:4px;padding:12px 16px;">
+          <div class="pred-abbr neon-red" id="pred-away-abbr">${abbr(predTeams[1]||'LIV')}</div>
+          <select id="pred-away" style="background:transparent;border:none;color:${C.fgSec};font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;outline:none;margin-top:4px;width:100%;" onchange="updateAbbr('away')">
+            ${opts.replace(`value="${predTeams[0]}"`,`value="${predTeams[0]}"`)}
+          </select>
+        </div>
+      </div>
+    </div>
+    <button class="pred-btn" id="pred-btn" onclick="runPredict()" style="background:${C.gold};color:#070914;box-shadow:0 0 20px ${GLOW.gold};">
+      ⚡&nbsp; PREDECIR PARTIDO
+    </button>
+    <div id="pred-result" style="display:none;"></div>
+  `,'padding:24px;');
+
+  // Set second team default
+  const awayEl=document.getElementById('pred-away');
+  if(awayEl && predTeams.length>1) awayEl.value=predTeams[1];
+  document.getElementById('pred-away-abbr').textContent=abbr(predTeams[1]||'LIV');
+}
+
+function updateAbbr(side){
+  const sel=document.getElementById(`pred-${side}`);
+  const abbEl=document.getElementById(`pred-${side}-abbr`);
+  if(sel&&abbEl) abbEl.textContent=abbr(sel.value);
+}
+
+function runPredict(){
+  const home=document.getElementById('pred-home').value;
+  const away=document.getElementById('pred-away').value;
+  if(home===away){ alert('Elige equipos distintos'); return; }
+
+  const btn=document.getElementById('pred-btn');
+  btn.disabled=true;
+  btn.style.background='transparent';
+  btn.style.color=C.gold;
+  btn.style.boxShadow='none';
+  btn.innerHTML='<span class="spinner"></span>&nbsp; CALCULANDO...';
+
+  setTimeout(()=>{
+    const key=`${home}_vs_${away}`;
+    const p=predData?.predictions?.[key];
+    if(!p){ btn.disabled=false; btn.style.background=C.gold; btn.style.color='#070914'; btn.style.boxShadow=`0 0 20px ${GLOW.gold}`; btn.innerHTML='⚡&nbsp; PREDECIR PARTIDO'; return; }
+
+    const bars=[
+      {label:'LOCAL',   val:p.prob_h, color:C.green,  name:home, goals:p.goals_h},
+      {label:'EMPATE',  val:p.prob_d, color:C.gold,   name:'',   goals:null},
+      {label:'VISITANTE',val:p.prob_a,color:C.red,    name:away, goals:p.goals_a},
+    ];
+    const winner=bars.reduce((a,b)=>a.val>b.val?a:b);
+    const ts_h=predData.team_stats?.[home];
+    const ts_a=predData.team_stats?.[away];
+
+    const probBars=bars.map(b=>{
+      const g=glowOf(b.color);
+      const isW=b===winner;
+      return `<div class="prob-cell" style="flex:${Math.max(b.val*10,0.8)};background:${b.color}14;border:1px solid ${b.color};box-shadow:${isW?`0 0 24px ${g}`:'none'};">
+        <div class="prob-pct" style="color:${b.color};text-shadow:${isW?`0 0 20px ${g}`:'none'}">${(b.val*100).toFixed(1)}%</div>
+        <div class="prob-lbl" style="color:${b.color}">${b.label}</div>
+        ${b.goals!==null?`<div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:${b.color};opacity:.6;margin-top:3px;">~${b.goals.toFixed(1)} goles</div>`:''}
+      </div>`;
+    }).join('');
+
+    const winnerG=glowOf(winner.color);
+    const resultText=winner.label==='EMPATE'?'Empate probable':`${winner.name} gana`;
+    const totalGoals=(p.goals_h+p.goals_a).toFixed(1);
+
+    const teamStatRow=(ts,label,isHome)=>{
+      if(!ts)return'';
+      const side=isHome?'home':'away';
+      const st=ts[side]||{};
+      return `<div class="team-stat-card">
+        <div class="team-stat-name" style="color:${isHome?C.green:C.red}">${label}</div>
+        <div class="team-stat-row"><span class="team-stat-k">Goles marcados (media)</span><span class="team-stat-v" style="color:${isHome?C.green:C.red}">${(st.gs||0).toFixed(2)}</span></div>
+        <div class="team-stat-row"><span class="team-stat-k">Goles recibidos (media)</span><span class="team-stat-v">${(st.gc||0).toFixed(2)}</span></div>
+        <div class="team-stat-row"><span class="team-stat-k">Shots on target (media)</span><span class="team-stat-v" style="color:${C.cyan}">${(st.so||0).toFixed(1)}</span></div>
+        <div class="team-stat-row"><span class="team-stat-k">Victorias en temporada</span><span class="team-stat-v" style="color:${C.gold}">${ts.wins||0}</span></div>
+      </div>`;
+    };
+
+    document.getElementById('pred-result').style.display='block';
+    document.getElementById('pred-result').innerHTML=`
+      <div class="prob-grid">${probBars}</div>
+      <div class="result-box">
+        <span style="color:${C.fgMut}">Predicción: </span>
+        <span style="color:${winner.color};font-weight:600;text-shadow:0 0 12px ${winnerG}">${resultText}</span>
+        <span style="color:${C.fgMut}"> · ${(winner.val*100).toFixed(1)}% prob. · Goles esperados: <span style="color:${C.gold}">${totalGoals}</span></span>
+      </div>
+      <div class="team-stats-row">
+        ${teamStatRow(ts_h, home, true)}
+        ${teamStatRow(ts_a, away, false)}
+      </div>
+    `;
+
+    btn.disabled=false;
+    btn.style.background=C.gold;
+    btn.style.color='#070914';
+    btn.style.boxShadow=`0 0 20px ${GLOW.gold}`;
+    btn.innerHTML='⚡&nbsp; PREDECIR PARTIDO';
+  }, 900);
+}
+
+function buildFeaturesCard(){
+  const el=document.getElementById('features-card');
+  if(!el)return;
+  const feats=['Rolling Stats (últimos 5 partidos)','Odds Bet365 (b365h/d/a)','Home/Away splits históricos','Goles marcados/recibidos','Shots on target rolling','Probabilidades implícitas','K-Fold CV estratificado','Logística OvR (L2, C=0.1)'];
+  el.innerHTML=hudCard(C.border,`
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:${C.fgMut};margin-bottom:10px;">Features del Modelo</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      ${feats.map(f=>`<span class="feat-tag">${f}</span>`).join('')}
+    </div>
+  `,'padding:16px;',false);
+}
+
+/* ══════════════════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════════════════ */
+const VIEWS=['dashboard','shotmap','predictor','clustering','modelos'];
+
+function showView(name){
+  VIEWS.forEach(v=>{
+    const el=document.getElementById(`view-${v}`);
+    if(el) el.classList.toggle('active', v===name);
+  });
+  document.querySelectorAll('#main-nav button').forEach((btn,i)=>{
+    btn.classList.toggle('active', VIEWS[i]===name);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ══════════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════════ */
+function init(){
+  buildTicker();
+  buildKPI('kpi-grid');
+  buildModelChart('model-chart-home', 4);
+  buildModelChart('model-chart-full', MODELS_DATA.length);
+  buildClusterPanel('cluster-panel-home');
+  buildClusterPanel('cluster-panel-full');
+  buildShotPanel('shot-panel-home');
+  buildShotStats();
+
+  // Shot map view
+  buildShotPanel('shotmap-card');
+  buildImgCard('roc-card', C.purple, 'Curva ROC · Modelo xG', 'AUC = 0.774', '02_xg_roc_curva.png');
+
+  // Modelos view
+  buildImgCard('roc-card-models',  C.purple, 'Curva ROC · xG',        'AUC = 0.774',             '02_xg_roc_curva.png');
+  buildImgCard('benchmark-card',   C.gold,   'Benchmark vs Bet365',   'accuracy comparison',     '10_benchmark_vs_bet365.png');
+  buildImgCard('all-models-card',  C.cyan,   'Todos los Modelos',     'comparación global 5-fold','08_comparacion_todos_modelos.png');
+
+  // Clustering view
+  buildImgCard('cluster-img-card', C.purple, 'Clustering Visualization','K-Means k=4',            '11_clustering_estilos.png');
+  buildImgCard('infographic-card', C.gold,   'Resumen del Proyecto',  'infográfico general',      '14_resumen_infografico.png');
+
+  // Predictor
+  loadPredictions();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
