@@ -1,15 +1,7 @@
 {
   "version": 2,
-  "builds": [
-    { "src": "dashboard/index.html", "use": "@vercel/static" },
-    { "src": "dashboard/data/**",    "use": "@vercel/static" },
-    { "src": "dashboard/img/**",     "use": "@vercel/static" },
-    { "src": "dashboard/*.mp4",      "use": "@vercel/static" }
-  ],
-  "routes": [
-    { "src": "/data/(.*)",    "dest": "/dashboard/data/$1"  },
-    { "src": "/img/(.*)",     "dest": "/dashboard/img/$1"   },
-    { "src": "/(.*\\.mp4)",  "dest": "/dashboard/$1"        },
-    { "src": "/(.*)",         "dest": "/dashboard/index.html" }
-  ]
+  "outputDirectory": "dashboard",
+  "buildCommand": null,
+  "installCommand": null,
+  "framework": null
 }
