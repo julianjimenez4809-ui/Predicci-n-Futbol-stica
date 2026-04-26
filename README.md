@@ -29,7 +29,7 @@ El trabajo se divide en dos modelos principales y una serie de análisis complem
 
 El proyecto incluye un dashboard interactivo desplegado en Vercel que cubre los ocho módulos del análisis: exploración de datos, modelo xG, shot map, predictor 1 vs 1, regresión lineal, clustering y comparación de modelos.
 
-[Ver dashboard en Vercel](https://taller-2-rose.vercel.app)
+[Ver dashboard en Vercel]([https://taller-2-rose.vercel.app](https://predicci-n-futbol-stica-i7ra.vercel.app))
 
 ---
 
