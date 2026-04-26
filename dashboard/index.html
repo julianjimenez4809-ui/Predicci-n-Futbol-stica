@@ -119,6 +119,9 @@ select option{background:#0F1330;color:var(--fg)}
 .mrv{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600}
 /* note box */
 .note{background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.2);border-radius:4px;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--fgs);line-height:1.5}
+/* section explanation */
+.section-explain{background:rgba(255,255,255,.022);border-left:3px solid var(--gold);border-radius:0 4px 4px 0;padding:14px 18px;margin-bottom:20px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--fgs);line-height:1.65}
+.section-explain strong{color:var(--fg);font-weight:600}
 /* grid helpers */
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
@@ -169,7 +172,10 @@ select option{background:#0F1330;color:var(--fg)}
     <div class="glitch neon-gold" data-text="MEJOR QUE BET365?" style="font-family:'Bebas Neue',sans-serif;font-size:68px;letter-spacing:.06em;line-height:.9;margin-bottom:18px">MEJOR QUE BET365?</div>
     <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--fgm);letter-spacing:.1em">MACHINE LEARNING I · UNIVERSIDAD EXTERNADO DE COLOMBIA · PL 2025–26</div>
   </div>
-  <div class="g6" style="margin-top:24px" id="kpi-grid"></div>
+  <div class="section-explain" style="margin-top:20px">
+    Este proyecto construye dos modelos de machine learning entrenados sobre datos reales de la Premier League 2025-26. El primero predice el resultado de cada partido (Victoria Local, Empate o Victoria Visitante); el segundo estima la probabilidad de gol para cada tiro (<strong>Expected Goals, xG</strong>). El objetivo concreto es superar la precisión histórica de <strong>Bet365 (50.2%)</strong> — la casa de apuestas más grande del mundo — utilizando únicamente información disponible antes del pitido inicial. Lo que ves aquí es el resultado de analizar <strong>291 partidos, 7.198 tiros y 444.252 eventos</strong> de una sola temporada.
+  </div>
+  <div class="g6" style="margin-top:8px" id="kpi-grid"></div>
   <div class="g2" style="margin-top:16px">
     <div id="dash-model-chart"></div>
     <div id="dash-cluster"></div>
@@ -182,6 +188,9 @@ select option{background:#0F1330;color:var(--fg)}
   <div class="fade-up" style="padding-top:32px;margin-bottom:20px">
     <div class="glitch neon-gold" data-text="ANÁLISIS EXPLORATORIO" style="font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:.06em">ANÁLISIS EXPLORATORIO</div>
     <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--fgs);margin-top:4px">Premier League 2025-26 · 291 partidos · 444,252 eventos · 20 equipos</div>
+  </div>
+  <div class="section-explain">
+    Antes de entrenar cualquier modelo, se exploró la base de datos de eventos del partido a partido. El análisis confirmó que los <strong>empates son el resultado más difícil de predecir</strong> (26.1% de los partidos) porque son el resultado con menor señal en las odds y en las estadísticas previas. También se encontró que <strong>el 59.7% de los goles ocurren en el segundo tiempo</strong>, un patrón consistente con la fatiga defensiva descrita en la literatura. La tasa de conversión global (11.2%) establece la base del modelo xG.
   </div>
   <!-- KPIs EDA -->
   <div class="g4" style="margin-bottom:16px" id="eda-kpis"></div>
@@ -203,6 +212,9 @@ select option{background:#0F1330;color:var(--fg)}
     <div class="glitch neon-purple" data-text="MODELO xG — EXPECTED GOALS" style="font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:.06em">MODELO xG — EXPECTED GOALS</div>
     <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--fgs);margin-top:4px">Regresión Logística · 7,198 tiros · class_weight=balanced · 80/20 split estratificado</div>
   </div>
+  <div class="section-explain">
+    El modelo de Expected Goals (<strong>xG</strong>) responde a la pregunta: dado un tiro, ¿cuánto vale? Se entrena una regresión logística sobre 7.198 disparos registrados en la temporada, usando características como la distancia al arco, el ángulo, si fue de cabeza, si fue una gran oportunidad o un penal. El <strong>AUC-ROC de 0.774</strong> indica que el modelo discrimina bien entre tiros que terminan en gol y los que no, muy por encima del baseline de 0.50. El mayor reto fue el <strong>desbalance de clases</strong>: solo 1 de cada 9 tiros acaba en gol, por eso se usó <code>class_weight=balanced</code> para que el modelo no simplemente aprenda a decir "no gol" siempre.
+  </div>
   <div class="g4" style="margin-bottom:16px" id="xg-kpis"></div>
   <div class="g2" style="margin-bottom:16px">
     <div id="xg-roc"></div>
@@ -220,8 +232,12 @@ select option{background:#0F1330;color:var(--fg)}
     <div class="glitch neon-purple" data-text="SHOT MAP & xG" style="font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:.06em">SHOT MAP & xG</div>
     <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--fgs);margin-top:4px">7,198 tiros · 807 goles · GW1–GW30 · Premier League 2025–26</div>
   </div>
+  <div class="section-explain" style="border-left-color:var(--purple)">
+    El shot map representa la <strong>posición de cada tiro en el campo</strong>, coloreado según si terminó en gol o no. El tamaño de cada punto refleja el valor xG asignado por el modelo: puntos grandes indican tiros de alta probabilidad (área chica, ángulo central), puntos pequeños indican tiros lejanos o de ángulo cerrado. Así se puede ver de un vistazo <strong>dónde se concentra el peligro real</strong> en la Premier League esta temporada y por qué la distancia al arco es la feature más importante del modelo xG.
+  </div>
   <div class="g4" style="margin-bottom:16px" id="sm-stats"></div>
   <div id="sm-main"></div>
+  <div style="margin-top:16px" id="sm-legend"></div>
   <div style="margin-top:16px" id="sm-roc"></div>
 </div>
 
@@ -230,7 +246,10 @@ select option{background:#0F1330;color:var(--fg)}
   <div style="max-width:740px;margin:40px auto">
     <div class="fade-up" style="margin-bottom:20px">
       <div class="glitch neon-gold" data-text="PREDICTOR DE PARTIDOS" style="font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:.06em">PREDICTOR DE PARTIDOS</div>
-      <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--fgs);margin-top:4px">Selecciona dos equipos y obtén probabilidades H/D/A con nuestro modelo de ML entrenado.</div>
+      <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--fgs);margin-top:4px">Logística OvR · 380 combinaciones pre-computadas · Selecciona dos equipos y obtén probabilidades reales.</div>
+    </div>
+    <div class="section-explain fade-up" style="border-left-color:var(--gold);margin-bottom:16px">
+      Selecciona el equipo local y visitante para obtener las probabilidades de cada resultado (<strong>H/D/A</strong>) junto con los goles esperados. Las predicciones provienen de un modelo de regresión logística OvR entrenado con las odds de Bet365 como features principales — la información más comprimida y eficiente disponible antes del partido. Las estadísticas de temporada de cada equipo se muestran como contexto, no como parte del modelo.
     </div>
     <div class="fade-up fu1" id="pred-card"></div>
     <div class="fade-up fu2" style="margin-top:12px" id="feat-card"></div>
@@ -242,6 +261,9 @@ select option{background:#0F1330;color:var(--fg)}
   <div class="fade-up" style="padding-top:32px;margin-bottom:20px">
     <div class="glitch neon-cyan" data-text="REGRESIÓN LINEAL — GOLES" style="font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:.06em">REGRESIÓN LINEAL — GOLES</div>
     <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--fgs);margin-top:4px">Parte A · Predicción de total_goals (variable continua) · 241 partidos · 5-Fold CV cronológico</div>
+  </div>
+  <div class="section-explain" style="border-left-color:var(--cyan)">
+    La Parte A del taller requería aplicar regresión lineal clásica para predecir el número de goles en un partido. El resultado más importante — y más honesto — es el <strong>R² negativo</strong>. Esto no es un error del modelo: es la respuesta correcta. Los goles siguen una distribución de Poisson con alta varianza aleatoria (CV=0.56) y la correlación máxima entre cualquier feature pre-partido y el total de goles es de apenas 0.10. Como documentaron Maher (1982) y Dixon-Coles (1997), predecir goles con información previa tiene un techo estadístico muy bajo. El modelo pasa los <strong>5 supuestos clásicos</strong> de regresión lineal y el VIF confirma que no hay multicolinealidad.
   </div>
   <div class="g4" style="margin-bottom:16px" id="lin-kpis"></div>
   <div class="g2" style="margin-bottom:16px">
@@ -261,6 +283,9 @@ select option{background:#0F1330;color:var(--fg)}
     <div class="glitch neon-purple" data-text="ESTILOS DE JUEGO" style="font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:.06em">ESTILOS DE JUEGO</div>
     <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--fgs);margin-top:4px">K-Means · 20 equipos · 4 perfiles tácticos · PL 2025-26</div>
   </div>
+  <div class="section-explain" style="border-left-color:var(--purple)">
+    Como bonus, se aplicó <strong>K-Means con k=4</strong> sobre estadísticas de rolling (goles marcados, recibidos, shots on target) para descubrir patrones tácticos sin supervisión. Los cuatro grupos emergentes tienen sentido futbolístico: equipos dominantes con alta posesión, equipos compactos que se defienden bien, equipos de contragolpe que aprovechan espacios, y equipos con desequilibrios ofensivos o defensivos que los ponen en zona de descenso. Este análisis no afecta la predicción directamente, pero permite <strong>entender la señal estructural que los modelos están captando</strong>.
+  </div>
   <div class="g32" style="margin-bottom:16px">
     <div id="cl-img"></div>
     <div id="cl-panel"></div>
@@ -273,6 +298,9 @@ select option{background:#0F1330;color:var(--fg)}
   <div class="fade-up" style="padding-top:32px;margin-bottom:20px">
     <div class="glitch neon-cyan" data-text="COMPARACIÓN DE MODELOS" style="font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:.06em">COMPARACIÓN DE MODELOS</div>
     <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--fgs);margin-top:4px">10 modelos evaluados · 5-Fold CV Estratificado · Benchmark Bet365 50.2%</div>
+  </div>
+  <div class="section-explain" style="border-left-color:var(--cyan)">
+    Para el Match Predictor se evaluaron <strong>10 configuraciones de modelos</strong> con 5-Fold Cross Validation estratificado, asegurando que cada fold mantuviera la proporción de resultados H/D/A. El experimento incluyó distintos conjuntos de features: solo rolling stats, solo odds de Bet365, combinaciones mixtas, y modelos más complejos como XGBoost y Random Forest. El ganador fue la <strong>regresión logística OvR con C=0.1 entrenada solo con las odds crudas de Bet365</strong> (49.4%), lo que indica que los bookmakers ya comprimen todo el valor predictivo disponible en sus números. Los modelos más complejos no aportaron mejora — con n=241 partidos, la varianza domina sobre el sesgo.
   </div>
   <div class="g2" style="margin-bottom:16px">
     <div id="mod-chart-full"></div>
@@ -582,6 +610,40 @@ function buildShotStats(){
       <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:${C.fgm};text-transform:uppercase;letter-spacing:.1em;margin-top:4px">${s.lbl}</div>
     </div>
   `,'padding:0')).join('');
+
+  // legend card
+  const lg=document.getElementById('sm-legend');if(!lg)return;
+  lg.innerHTML=card(C.border,`
+    ${sh('Cómo leer el Shot Map','guía rápida',C.fgm)}
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+      <div style="background:${C.raised};border:1px solid ${C.border};border-radius:4px;padding:12px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <div style="width:14px;height:14px;border-radius:50%;background:${C.gold};box-shadow:0 0 10px ${G.gold};flex-shrink:0"></div>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:${C.gold};letter-spacing:.06em;text-transform:uppercase">Gol</span>
+        </div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:11px;color:${C.fgs};line-height:1.5">El tiro terminó en gol. El tamaño del punto refleja el xG asignado.</div>
+      </div>
+      <div style="background:${C.raised};border:1px solid ${C.border};border-radius:4px;padding:12px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <div style="width:10px;height:10px;border-radius:50%;background:${C.fgm};flex-shrink:0"></div>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:${C.fgs};letter-spacing:.06em;text-transform:uppercase">No Gol</span>
+        </div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:11px;color:${C.fgs};line-height:1.5">El tiro no entró. La mayoría de los puntos son de este tipo (88.8%).</div>
+      </div>
+      <div style="background:${C.raised};border:1px solid ${C.border};border-radius:4px;padding:12px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <div style="display:flex;gap:3px;align-items:flex-end">
+            <div style="width:6px;height:6px;border-radius:50%;background:${C.purple}"></div>
+            <div style="width:10px;height:10px;border-radius:50%;background:${C.purple}"></div>
+            <div style="width:15px;height:15px;border-radius:50%;background:${C.purple}"></div>
+          </div>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:${C.purple};letter-spacing:.06em;text-transform:uppercase">Tamaño = xG</span>
+        </div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:11px;color:${C.fgs};line-height:1.5">Puntos grandes = tiros de alta probabilidad (penales, área pequeña). Puntos chicos = tiros lejanos o de ángulo.</div>
+      </div>
+    </div>
+    <div class="note" style="margin-top:12px;border-color:rgba(191,95,255,.3);background:rgba(191,95,255,.05)">La zona de mayor densidad de goles está dentro del área chica, frente al arco. Esto valida que <strong style="color:${C.purple}">distance</strong> y <strong style="color:${C.purple}">angle</strong> son las features más predictivas del modelo xG.</div>
+  `,'padding:20px',false);
 }
 
 /* ── LINEAR REGRESSION VIEW ────────────────────────────────────────────── */
