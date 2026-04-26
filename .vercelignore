@@ -5,7 +5,7 @@ requirements.txt
 src/
 cuadernos/
 docs/
-img/
+/img/
 material de apoyo/
 diseño/
 data/
