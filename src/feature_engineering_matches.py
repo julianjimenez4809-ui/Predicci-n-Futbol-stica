@@ -4,7 +4,8 @@ import os
 
 def run_feature_engineering():
     # 1. Cargar el dataset de partidos
-    data_path = '/home/julianxd/code/machine/Prediccion-Futbolistica/data/matches.csv'
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    data_path = os.path.join(base_dir, 'data', 'matches.csv')
     if not os.path.exists(data_path):
         print(f"Error: No se encontró {data_path}")
         return
@@ -75,14 +76,25 @@ def run_feature_engineering():
     # Ejecutar y Guardar
     df_processed = get_rolling_stats(df_matches)
     # Seleccionar solo las columnas necesarias para el modelo + metadatos
-    cols_to_keep = ['id', 'date', 'home_team', 'away_team', 'ftr', 'b365h', 'b365d', 'b365a', 
+    # Probabilidades implícitas normalizadas (sin margen de apuesta)
+    df_processed['imp_h'] = (1 / df_matches['b365h'])
+    df_processed['imp_d'] = (1 / df_matches['b365d'])
+    df_processed['imp_a'] = (1 / df_matches['b365a'])
+    total_imp = df_processed['imp_h'] + df_processed['imp_d'] + df_processed['imp_a']
+    df_processed['imp_h'] /= total_imp
+    df_processed['imp_d'] /= total_imp
+    df_processed['imp_a'] /= total_imp
+
+    cols_to_keep = ['id', 'date', 'home_team', 'away_team', 'fthg', 'ftag', 'ftr',
+                    'total_goals', 'b365h', 'b365d', 'b365a',
+                    'imp_h', 'imp_d', 'imp_a',
                     'rolling_goals_scored_h', 'rolling_goals_conceded_h', 'rolling_shots_h', 'rolling_shots_ot_h',
                     'rolling_goals_scored_a', 'rolling_goals_conceded_a', 'rolling_shots_a', 'rolling_shots_ot_a']
     
     df_processed = df_processed[cols_to_keep]
     df_processed.dropna(inplace=True) 
     
-    out_path = '/home/julianxd/code/machine/Prediccion-Futbolistica/data/matches_processed.csv'
+    out_path = os.path.join(base_dir, 'data', 'matches_processed.csv')
     df_processed.to_csv(out_path, index=False)
     print(f"Dataset procesado con {df_processed.shape[0]} partidos y nuevas estadísticas.")
 
