@@ -1,0 +1,12 @@
+*.py
+*.ipynb
+requirements.txt
+.venv/
+src/
+cuadernos/
+docs/
+img/
+material de apoyo/
+diseño/
+data/
+vercel.json
